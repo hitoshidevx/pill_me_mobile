@@ -1,14 +1,14 @@
 import React, { useContext, useState } from 'react';
 import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  ImageBackground,
-  StatusBar,
-  Modal,
-  Pressable,
-  Image
+    View,
+    Text,
+    TouchableOpacity,
+    StyleSheet,
+    ImageBackground,
+    StatusBar,
+    Modal,
+    Pressable,
+    Image
 } from 'react-native';
 import { TextInput } from 'react-native-gesture-handler';
 import { useNavigation } from '@react-navigation/native';
@@ -25,7 +25,8 @@ const Login = () => {
             flex: 1,
             backgroundColor: "#169567",
             justifyContent: "center",
-            alignItems: "center"
+            alignItems: "center",
+            resizeMode: 'cover',
         },
         textoLogin: {
             color: "white",
@@ -58,21 +59,28 @@ const Login = () => {
             textAlign: 'center',
             fontSize: 25,
             fontWeight: 600
+        },
+        overlay: {
+            justifyContent: "center",
+            alignItems: "center",
+            ...StyleSheet.absoluteFillObject,
+            backgroundColor: 'rgba(4, 65, 8, 0.7) ', // Altere para a cor desejada e ajuste a transparência
         }
     })
 
 
     return (
-        <View style={{flex: 1}}>
-            <View style={estilos.main}>
-                <Text style={estilos.textoLogin}>Login</Text>
-                <TextInput style={estilos.inputLogin} placeholder="E-mail" />
-                <TextInput style={estilos.inputLogin} placeholder="Senha" />
-                <TouchableOpacity style={estilos.botaoLogin} onPress={() => navigation.navigate('Main')}>
-                    <Text style={estilos.textoBotaoLogin}>Logar</Text>
-                </TouchableOpacity>
-            </View>
-            
+        <View style={{ flex: 1 }}>
+            <ImageBackground source={require("../assets/image_background.png")} style={estilos.main}>
+                <View style={estilos.overlay}>
+                    <Text style={estilos.textoLogin}>Login</Text>
+                    <TextInput style={estilos.inputLogin} placeholder="E-mail" />
+                    <TextInput style={estilos.inputLogin} placeholder="Senha" />
+                    <TouchableOpacity style={estilos.botaoLogin} onPress={() => navigation.navigate('Main')}>
+                        <Text style={estilos.textoBotaoLogin}>Logar</Text>
+                    </TouchableOpacity>
+                </View>
+            </ImageBackground>
             <Footer />
         </View>
     )

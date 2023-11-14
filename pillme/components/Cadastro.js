@@ -21,7 +21,8 @@ const Cadastro = () => {
             flex: 1,
             backgroundColor: "#169567",
             justifyContent: "center",
-            alignItems: "center"
+            alignItems: "center",
+            resizeMode: 'cover',
         },
         textoCadastro: {
             color: "white",
@@ -54,20 +55,28 @@ const Cadastro = () => {
             textAlign: 'center',
             fontSize: 25,
             fontWeight: 600
+        },
+        overlay: {
+            justifyContent: "center",
+            alignItems: "center",
+            ...StyleSheet.absoluteFillObject,
+            backgroundColor: 'rgba(4, 65, 8, 0.7) ', // Altere para a cor desejada e ajuste a transparência
         }
     })
 
     return (
         <View style={{flex: 1}}>
-            <View style={estilos.main}>
-                <Text style={estilos.textoCadastro}>Cadastro</Text>
-                <TextInput style={estilos.inputCadastro} placeholder="Nome" />
-                <TextInput style={estilos.inputCadastro} placeholder="E-mail" />
-                <TextInput style={estilos.inputCadastro} placeholder="Senha" />
-                <TouchableOpacity style={estilos.botaoCadastro}>
-                    <Text style={estilos.textoBotaoCadastro}>Pronto</Text>
-                </TouchableOpacity>
-            </View>
+            <ImageBackground source={require("../assets/image_background.png")} style={estilos.main}>
+                <View style={estilos.overlay}>
+                    <Text style={estilos.textoCadastro}>Cadastro</Text>
+                    <TextInput style={estilos.inputCadastro} placeholder="Nome" />
+                    <TextInput style={estilos.inputCadastro} placeholder="E-mail" />
+                    <TextInput style={estilos.inputCadastro} placeholder="Senha" />
+                    <TouchableOpacity style={estilos.botaoCadastro}>
+                        <Text style={estilos.textoBotaoCadastro}>Pronto</Text>
+                    </TouchableOpacity>
+                </View>
+            </ImageBackground>
             <Footer />
         </View>
     )
