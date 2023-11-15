@@ -13,16 +13,21 @@ import {
 import { TextInput } from 'react-native-gesture-handler';
 import Footer from './Footer';
 
-const Cadastro = () => {
+const Cadastro = ({navigation}) => {
 
     const estilos = StyleSheet.create({
 
         main: {
             flex: 1,
-            backgroundColor: "#169567",
+            backgroundColor: "#fff",
+            alignItems: "center"
+        },
+        sectionCadastro: {
+            backgroundColor: "#55B7FF",
             justifyContent: "center",
-            alignItems: "center",
-            resizeMode: 'cover',
+            padding: "10%",
+            borderRadius: 10,
+            marginTop: "20%"
         },
         textoCadastro: {
             color: "white",
@@ -31,22 +36,21 @@ const Cadastro = () => {
             textAlign: "center"
         },
         inputCadastro: {
-            width: "50%",
-            backgroundColor: "#9ED4A6",
+            width: "100%",
+            backgroundColor: "#fff",
             marginTop: "2rem",
             padding: ".7rem",
-            color: "white",
+            color: "#C6C6C6",
             fontWeight: 600,
             fontSize: 20,
-            borderRadius: 10
+            borderRadius: 10,
+            textAlign: "center"
         },
         botaoCadastro: {
-            backgroundColor: '#00D488',
-            width: "50%",
+            backgroundColor: '#0171FF',
+            width: "100%",
             height: 50,
-            marginLeft: 20,
             marginTop: "3rem",
-            borderRadius: 10,
             justifyContent: "center",
             alignItems: "center"
         },
@@ -55,29 +59,28 @@ const Cadastro = () => {
             textAlign: 'center',
             fontSize: 25,
             fontWeight: 600
-        },
-        overlay: {
-            justifyContent: "center",
-            alignItems: "center",
-            ...StyleSheet.absoluteFillObject,
-            backgroundColor: 'rgba(4, 65, 8, 0.7) ', // Altere para a cor desejada e ajuste a transparência
         }
     })
 
     return (
         <View style={{flex: 1}}>
-            <ImageBackground source={require("../assets/image_background.png")} style={estilos.main}>
-                <View style={estilos.overlay}>
-                    <Text style={estilos.textoCadastro}>Cadastro</Text>
-                    <TextInput style={estilos.inputCadastro} placeholder="Nome" />
-                    <TextInput style={estilos.inputCadastro} placeholder="E-mail" />
-                    <TextInput style={estilos.inputCadastro} placeholder="Senha" />
-                    <TouchableOpacity style={estilos.botaoCadastro}>
+            <View style={estilos.main}>
+                <View style={{width: "80%"}}>
+                    <View style={estilos.sectionCadastro}>
+                        <Text style={estilos.textoCadastro}>Cadastro</Text>
+                        <TextInput style={estilos.inputCadastro} placeholder="Digite seu nome..." />
+                        <TextInput style={estilos.inputCadastro} placeholder="Digite seu e-mail..." />
+                        <TextInput style={estilos.inputCadastro} placeholder="Digite sua senha..." />
+                    </View>
+                    <TouchableOpacity style={estilos.botaoCadastro} onPress={() => navigation.navigate("Login")}>
                         <Text style={estilos.textoBotaoCadastro}>Pronto</Text>
                     </TouchableOpacity>
+                    
+                    <TouchableOpacity onPress={() => navigation.navigate("Login")}>
+                        <Text style={{textAlign: "center", fontSize: 20, color: "#ACACAC", marginTop: "10%", fontWeight: 400, textDecorationLine: "underline"}}>Já tem conta? Faça login aqui!</Text>
+                    </TouchableOpacity>
                 </View>
-            </ImageBackground>
-            <Footer />
+            </View>
         </View>
     )
 }

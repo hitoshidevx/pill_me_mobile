@@ -13,45 +13,51 @@ function AppNavigator() {
             <Stack.Screen name="Main" component={MainTabNavigator} options={{ headerShown: false }} />
             <Stack.Screen name="Home" component={Home}
                 options={{
-                    title: 'Pill Time',
+                    title: 'PillTime',
                     headerStyle: {
-                        backgroundColor: '#00D488',
-                        height: 100
+                        backgroundColor: '#0171FF',
+                        height: 130,   
+                        borderBottomLeftRadius: 30,
+                        borderBottomRightRadius: 30
                     },
                     headerTintColor: '#fff',
                     headerTitleStyle: {
-                        fontSize: 30,
-                        fontWeight: 800
+                        fontSize: 40,
+                        fontWeight: 700
                     },
-                    headerTitleAlign: 'center'
+                    headerTitleAlign: 'center',
                 }} />
             <Stack.Screen name="Login" component={Login}
                 options={{
-                    title: 'Pill Time',
+                    title: 'PillTime',
                     headerStyle: {
-                        backgroundColor: '#00D488',
-                        height: 100
+                        backgroundColor: '#0171FF',
+                        height: 130,   
+                        borderBottomLeftRadius: 30,
+                        borderBottomRightRadius: 30
                     },
                     headerTintColor: '#fff',
                     headerTitleStyle: {
-                        fontSize: 30,
-                        fontWeight: 800
+                        fontSize: 40,
+                        fontWeight: 700
                     },
-                    headerTitleAlign: 'center'
+                    headerTitleAlign: 'center',
                 }} />
             <Stack.Screen name="Cadastro" component={Cadastro}
                 options={{
-                    title: 'Pill Time',
+                    title: 'PillTime',
                     headerStyle: {
-                        backgroundColor: '#00D488',
-                        height: 100
+                        backgroundColor: '#0171FF',
+                        height: 130,   
+                        borderBottomLeftRadius: 30,
+                        borderBottomRightRadius: 30
                     },
                     headerTintColor: '#fff',
                     headerTitleStyle: {
-                        fontSize: 30,
-                        fontWeight: 800
+                        fontSize: 40,
+                        fontWeight: 700
                     },
-                    headerTitleAlign: 'center'
+                    headerTitleAlign: 'center',
                 }} />
         </Stack.Navigator>
     );
