@@ -24,9 +24,9 @@ function MinhaConta() {
         sectionCadastro: {
             backgroundColor: "#55B7FF",
             justifyContent: "center",
-            padding: "10%",
+            padding: "15%",
             borderRadius: 10,
-            marginTop: "20%"
+            marginTop: "10%"
         },
         textoCadastro: {
             color: "white",
@@ -37,27 +37,13 @@ function MinhaConta() {
         inputCadastro: {
             width: "100%",
             backgroundColor: "#fff",
-            marginTop: "2rem",
-            padding: ".7rem",
+            marginTop: "20%",
+            padding: "5%",
             color: "#C6C6C6",
             fontWeight: 600,
             fontSize: 20,
-            borderRadius: 10,
-            textAlign: "center"
-        },
-        botaoCadastro: {
-            backgroundColor: '#0171FF',
-            width: "100%",
-            height: 50,
-            marginTop: "3rem",
-            justifyContent: "center",
-            alignItems: "center"
-        },
-        textoBotaoCadastro: {
-            color: 'white',
-            textAlign: 'center',
-            fontSize: 25,
-            fontWeight: 600
+            textAlign: "center",
+            borderRadius: 10
         }
     })
 
@@ -67,7 +53,7 @@ function MinhaConta() {
                 <View style={{width: "80%", marginTop: "15%"}}>
                     <View style={estilos.sectionCadastro}>
                         <Text style={estilos.textoCadastro}>Minha Conta</Text>
-                        <Text style={estilos.inputCadastro}>Nome</Text>
+                        <Text style={estilos.inputCadastro} >Nome</Text>
                         <Text style={estilos.inputCadastro}>E-mail</Text>
                         <Text style={estilos.inputCadastro}>Seus Remédios: 0</Text>
                     </View>

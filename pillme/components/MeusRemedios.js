@@ -21,19 +21,19 @@ function MeusRemedios() {
         },
         estiloText: {
             textAlign: "center",
-            fontWeight: 700,
+            fontWeight: "600",
             color: "#4583D0",
             fontSize: 25,
-            marginTop: "10%",
-            marginBottom: "10%"
+            marginTop: "15%",
+            marginBottom: "15%"
         },
         pillSection: {
             width: "100%",
             backgroundColor: "#0171FF",
             borderRadius: 10,
-            padding: "2rem",
-            alignItems: "space-around",
-            marginBottom: "3rem"
+            padding: "5%",
+            alignItems: "flex-start",
+            marginBottom: "20%"
         }
     })
 
@@ -43,16 +43,16 @@ function MeusRemedios() {
                 <Text style={estilos.estiloText}>Meus Remédios</Text>
                 <TouchableOpacity style={estilos.pillSection}> 
                     <Text style={{color: "white", fontSize: 30, fontWeight: 600}}>Remédio 1</Text>
-                    <Text style={{color: "#4F9CFF", fontSize: 20, fontWeight: 500}}>Alarme em: 10h</Text>
+                    <Text style={{color: "#4F9CFF", fontSize: 20, fontWeight: 500}}>Alarme em: 1h</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity style={estilos.pillSection}> 
-                    <Text style={{color: "white", fontSize: 30, fontWeight: 600}}>Remédio 1</Text>
-                    <Text style={{color: "#4F9CFF", fontSize: 20, fontWeight: 500}}>Alarme em: 10h</Text>
+                    <Text style={{color: "white", fontSize: 30, fontWeight: 600}}>Remédio 2</Text>
+                    <Text style={{color: "#4F9CFF", fontSize: 20, fontWeight: 500}}>Alarme em: 5h</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity style={estilos.pillSection}> 
-                    <Text style={{color: "white", fontSize: 30, fontWeight: 600}}>Remédio 1</Text>
+                    <Text style={{color: "white", fontSize: 30, fontWeight: 600}}>Remédio 3</Text>
                     <Text style={{color: "#4F9CFF", fontSize: 20, fontWeight: 500}}>Alarme em: 10h</Text>
                 </TouchableOpacity>
             </View>

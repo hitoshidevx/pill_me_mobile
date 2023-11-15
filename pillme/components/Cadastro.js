@@ -27,7 +27,7 @@ const Cadastro = ({navigation}) => {
             justifyContent: "center",
             padding: "10%",
             borderRadius: 10,
-            marginTop: "20%"
+            marginTop: "30%"
         },
         textoCadastro: {
             color: "white",
@@ -38,8 +38,8 @@ const Cadastro = ({navigation}) => {
         inputCadastro: {
             width: "100%",
             backgroundColor: "#fff",
-            marginTop: "2rem",
-            padding: ".7rem",
+            marginTop: "15%",
+            padding: "5%",
             color: "#C6C6C6",
             fontWeight: 600,
             fontSize: 20,
@@ -50,7 +50,7 @@ const Cadastro = ({navigation}) => {
             backgroundColor: '#0171FF',
             width: "100%",
             height: 50,
-            marginTop: "3rem",
+            marginTop: "10%",
             justifyContent: "center",
             alignItems: "center"
         },
