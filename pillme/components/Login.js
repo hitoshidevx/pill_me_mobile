@@ -11,8 +11,39 @@ import {
   Image
 } from 'react-native';
 import { TextInput } from 'react-native-gesture-handler';
+import axios from "axios"
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+const apiLogin = axios.create({
+    baseURL: "https://identitytoolkit.googleapis.com/v1"
+})
+
+const apiKEY = "AIzaSyCTfD20veiK1KRrq4wocpCWIa-8eFj09JE"
 
 const Login = ({navigation}) => {
+
+    const [email, setEmail] = useState("")
+    const [password, setPassword] = useState("")
+    const [token, setToken] = useState("")
+
+    const loginUser = () => {
+        apiLogin.post("accounts:signInWithPassword?key=" + apiKEY, {email, password, returnSecureToken: true})
+        .then((resposta) => {
+            if(resposta.data.registered == true) {
+                // Setando no localStorage se o token do usuario para acesso nas telas de Meus Remedios, Cadastrar Remedio e Minha Conta
+                AsyncStorage.setItem("userToken", resposta.data.localId)
+                AsyncStorage.setItem("idToken", resposta.data.idToken)
+                console.log("Deu bom no login")
+                navigation.navigate("Main")
+            } else {
+                console.log("Deu ruim no login ein.")
+                return
+            }
+        })
+        .catch((err) => {
+            console.log("Deu erro aqui: ", err)
+        })
+    }
 
     const estilos = StyleSheet.create({
 
@@ -67,10 +98,16 @@ const Login = ({navigation}) => {
                 <View style={{width: "80%"}}>
                     <View style={estilos.sectionLogin}>
                         <Text style={estilos.textoLogin}>Login</Text>
-                        <TextInput style={estilos.inputLogin} placeholder="Digite seu e-mail..." />
-                        <TextInput style={estilos.inputLogin} placeholder="Digite sua senha..." />
+                        <TextInput style={estilos.inputLogin} placeholder="Digite seu e-mail..." 
+                            value={email}
+                            onChangeText={(text) => setEmail(text)}
+                        />
+                        <TextInput style={estilos.inputLogin} placeholder="Digite sua senha..." secureTextEntry={true}
+                            value={password}
+                            onChangeText={(text) => setPassword(text)}
+                        />
                     </View>
-                    <TouchableOpacity style={estilos.botaoLogin} onPress={() => navigation.navigate("Main")}>
+                    <TouchableOpacity style={estilos.botaoLogin} onPress={() => loginUser()}>
                         <Text style={estilos.textoBotaoLogin}>Pronto</Text>
                     </TouchableOpacity>
                     

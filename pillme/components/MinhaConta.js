@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -11,8 +11,45 @@ import {
   Image
 } from 'react-native';
 import { TextInput } from 'react-native-gesture-handler';
+import axios from "axios"
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+const apiMinhaConta = axios.create({
+    baseURL: "https://identitytoolkit.googleapis.com/v1"
+})
+
+const apiKEY = "AIzaSyCTfD20veiK1KRrq4wocpCWIa-8eFj09JE"
 
 function MinhaConta() {
+
+    const [name, setName] = useState("")
+    const [email, setEmail] = useState("")
+    const [token, setToken] = useState("")
+    const [remedios, setRemedios] = useState(null)
+
+    const getUser = async () => {
+        try {
+            const value = await AsyncStorage.getItem("idToken");
+
+            const resposta = await apiMinhaConta.post("accounts:lookup?key=" + apiKEY, 
+            {
+                idToken: value
+            })
+
+            if(resposta.status === 200) {
+                setName(resposta.data.users[0].displayName)
+                setEmail(resposta.data.users[0].email)
+
+            }
+
+        } catch (error) {
+            console.log('Erro ao obter o token:', error);
+        }
+    }
+
+    useEffect(() => {
+        getUser();
+    }, [])
 
     const estilos = StyleSheet.create({
 
@@ -53,8 +90,8 @@ function MinhaConta() {
                 <View style={{width: "80%", marginTop: "15%"}}>
                     <View style={estilos.sectionCadastro}>
                         <Text style={estilos.textoCadastro}>Minha Conta</Text>
-                        <Text style={estilos.inputCadastro} >Nome</Text>
-                        <Text style={estilos.inputCadastro}>E-mail</Text>
+                        <Text style={estilos.inputCadastro} >Nome: {name}</Text>
+                        <Text style={estilos.inputCadastro}>E-mail: {email}</Text>
                         <Text style={estilos.inputCadastro}>Seus Remédios: 0</Text>
                     </View>
                 </View>

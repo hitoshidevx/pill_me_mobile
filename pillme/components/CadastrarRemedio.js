@@ -11,6 +11,12 @@ import {
     Image
 } from 'react-native';
 import { TextInput } from 'react-native-gesture-handler';
+import axios from "axios"
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+const apiKEY = axios.create({
+    baseURL: "https://pill-time-3d9f9-default-rtdb.firebaseio.com"
+})
 
 function CadastrarRemedio() {
 
@@ -20,6 +26,35 @@ function CadastrarRemedio() {
     const [isDataInicialFocus, setDataInicialFocus] = useState(false)
     const [isIntervaloFocus, setIntervaloFocus] = useState(false)
     const [isDataFinalFocus, setDataFinalFocus] = useState(false)
+
+    // States do remédio + userToken
+    const [nome, setNome] = useState("")
+    const [dosagem, setDosagem] = useState("")
+    const [dataInicial, setDataInicial] = useState("")
+    const [intervalo, setIntervalo] = useState("")
+    const [dataFinal, setDataFinal] = useState("")
+
+    // Função para criar o remédio
+    const createRemedy = async () => {
+        try {
+            const userId = await AsyncStorage.getItem("userToken")
+            const resposta = await apiKEY.post("/medicamentos.json", {
+                nome: nome,
+                dosagem: dosagem,
+                dataInicial: dataInicial,
+                intervalo: intervalo,
+                dataFinal: dataFinal,
+                userId: userId
+            })
+            
+            if(resposta.status === 200) {
+                console.log(resposta.data);
+            }
+
+        } catch (error) {
+            console.log("Erro durante o registro do medicamento: ", error)
+        }
+    }
 
     const estilos = StyleSheet.create({
         mainSection: {
@@ -68,25 +103,35 @@ function CadastrarRemedio() {
                 <TextInput style={estilos.inputText} placeholder={isNomeFocus ? "" : "Nome do Remédio"} placeholderTextColor="white" 
                     onFocus={() => setNomeFocus(true)}
                     onBlur={() => setNomeFocus(false)}
+                    value={nome}
+                    onChangeText={(text) => setNome(text)}
                 />
                 <TextInput style={estilos.inputText} placeholder={isDosagemFocus ? "" : "Dosagem"} placeholderTextColor="white" 
                     onFocus={() => setDosagemFocus(true)}
                     onBlur={() => setDosagemFocus(false)} 
+                    value={dosagem}
+                    onChangeText={(text) => setDosagem(text)}
                 />
                 <TextInput style={estilos.inputText} placeholder={isDataInicialFocus ? "" : "Data Inicial"} placeholderTextColor="white" 
                     onFocus={() => setDataInicialFocus(true)}
                     onBlur={() => setDataInicialFocus(false)} 
+                    value={dataInicial}
+                    onChangeText={(text) => setDataInicial(text)}
                 />
                 <TextInput style={estilos.inputText} placeholder={isIntervaloFocus ? "" : "Intervalo"} placeholderTextColor="white" 
                     onFocus={() => setIntervaloFocus(true)}
                     onBlur={() => setIntervaloFocus(false)} 
+                    value={intervalo}
+                    onChangeText={(text) => setIntervalo(text)}
                 />
                 <TextInput style={estilos.inputText} placeholder={isDataFinalFocus ? "" : "Data Final"} placeholderTextColor="white" 
                     onFocus={() => setDataFinalFocus(true)}
                     onBlur={() => setDataFinalFocus(false)} 
+                    value={dataFinal}
+                    onChangeText={(text) => setDataFinal(text)}
                 />
-                <TouchableOpacity style={estilos.selectImage}>
-                    <Text style={{color: "#B4B4B4", fontSize: 17, fontWeight: 600, textAlign: "center"}}>Selecionar Foto</Text>
+                <TouchableOpacity style={estilos.selectImage} onPress={() => createRemedy()}>
+                    <Text style={{color: "#B4B4B4", fontSize: 17, fontWeight: 600, textAlign: "center"}}>Pronto</Text>
                 </TouchableOpacity>
             </View>
         </View>
