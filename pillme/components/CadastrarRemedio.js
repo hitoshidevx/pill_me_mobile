@@ -18,7 +18,7 @@ const apiKEY = axios.create({
     baseURL: "https://pill-time-3d9f9-default-rtdb.firebaseio.com"
 })
 
-function CadastrarRemedio() {
+function CadastrarRemedio({navigation}) {
 
     // Lógica dos Placeholders
     const [isNomeFocus, setNomeFocus] = useState(false)
@@ -48,7 +48,7 @@ function CadastrarRemedio() {
             })
             
             if(resposta.status === 200) {
-                console.log(resposta.data);
+                navigation.navigate("MeusRemedios")
             }
 
         } catch (error) {
