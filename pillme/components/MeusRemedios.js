@@ -26,16 +26,30 @@ function MeusRemedios( {navigation} ) {
     const [modalVisible, setModalVisible] = useState(false)
     const [modalRemedio, setModalRemedio] = useState(null);
     const [remainingTime, setRemainingTime] = useState(0); // Estado para controlar o tempo restante
+    const [initialRemainingTime, setInitialRemainingTime] = useState(0)
 
-    const openModal = (remedio) => {
-        setModalVisible(true);
-        setModalRemedio(remedio);
-
-    };
-
+    // Armazena o tempo restante ao fechar o modal
     const closeModal = () => {
         setModalVisible(false);
+        if (modalRemedio) {
+            const selectedRemedio = lista.find(remedio => remedio.id === modalRemedio.id);
+            if (selectedRemedio) {
+                setRemainingTime(selectedRemedio.diffHora * 60 * 60 + selectedRemedio.diffMinuto * 60 + selectedRemedio.diffSegundo);
+                // Salva o tempo restante em AsyncStorage
+                AsyncStorage.setItem('remainingTime', (selectedRemedio.diffHora * 60 * 60 + selectedRemedio.diffMinuto * 60 + selectedRemedio.diffSegundo).toString());
+            }
+        }
     };
+
+    // Abre o modal e restaura o estado da contagem regressiva
+    const openModal = (remedio) => {
+        setModalRemedio(remedio);
+        if (remedio) {
+            setInitialRemainingTime(remedio.diffHora * 60 * 60 + remedio.diffMinuto * 60 + remedio.diffSegundo);
+        }
+        setModalVisible(true);
+    };
+
 
     const getRemedios = async () => {
         try {
@@ -134,6 +148,22 @@ function MeusRemedios( {navigation} ) {
     
       });
 
+      useEffect(() => {
+        // Ao iniciar, verifique se há um estado salvo em AsyncStorage
+        const restoreCountdownState = async () => {
+            try {
+                const savedRemainingTime = await AsyncStorage.getItem('remainingTime');
+                if (savedRemainingTime !== null) {
+                    setInitialRemainingTime(parseInt(savedRemainingTime));
+                }
+            } catch (error) {
+                console.log('Erro ao recuperar o estado da contagem regressiva:', error);
+            }
+        };
+
+        restoreCountdownState();
+    }, []);
+
     const estilos = StyleSheet.create({
         mainSection: {
             width: "100%",
@@ -202,6 +232,7 @@ function MeusRemedios( {navigation} ) {
                             <CountdownCircleTimer
                                 isPlaying
                                 duration={remainingTime}
+                                initialRemainingTime={initialRemainingTime}
                                 size={200}
                                 colors={['#004777', '#F7B801', '#A30000', '#A30000']}
                                 colorsTime={[7, 5, 2, 0]}
