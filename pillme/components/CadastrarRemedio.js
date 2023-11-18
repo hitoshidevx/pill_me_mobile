@@ -13,6 +13,8 @@ import {
 import { TextInput } from 'react-native-gesture-handler';
 import axios from "axios"
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import {  format  } from 'date-fns';
 
 const apiKEY = axios.create({
     baseURL: "https://pill-time-3d9f9-default-rtdb.firebaseio.com"
@@ -30,25 +32,48 @@ function CadastrarRemedio({navigation}) {
     // States do remédio + userToken
     const [nome, setNome] = useState("")
     const [dosagem, setDosagem] = useState("")
-    const [dataInicial, setDataInicial] = useState("")
-    const [intervalo, setIntervalo] = useState("")
-    const [dataFinal, setDataFinal] = useState("")
+    const [dataInicialSelecionada, setDataInicialSelecionada] = useState(new Date())
+    const [intervalo, setIntervalo] = useState(0)
+    const [dataFinalSelecionada, setDataFinalSelecionada] = useState(new Date())
+
+    // Testando logica
+    const [horaInicio, setHoraInicio] = useState(new Date());
+    const [dataNotificacao, setDataNotificacao] = useState(new Date());
+
+
+    const [showDateTimePicker, setShowDateTimePicker] = useState(false);
+
+    const handleInitialDateChange = () => {
+        const currentDate = dataInicialSelecionada;
+        setShowDateTimePicker(Platform.OS === 'ios');
+        setDataInicialSelecionada(currentDate);
+    };
+
+    const handleFinalDateChange = (event, selectedDate) => {
+        const currentDate = selectedDate || dataFinalSelecionada;
+        setShowDateTimePicker(Platform.OS === 'ios');
+        setDataFinalSelecionada(currentDate);
+    };
 
     // Função para criar o remédio
     const createRemedy = async () => {
         try {
             const userId = await AsyncStorage.getItem("userToken")
+
+            const dataInicialUTC = format(dataInicialSelecionada, "yyyy-MM-dd'T'HH:mm:ss.SSSxxx");
+            const dataFinalUTC = format(dataFinalSelecionada, "yyyy-MM-dd'T'HH:mm:ss.SSSxxx");
+
             const resposta = await apiKEY.post("/medicamentos.json", {
                 nome: nome,
                 dosagem: dosagem,
-                dataInicial: dataInicial,
-                intervalo: intervalo,
-                dataFinal: dataFinal,
+                dataInicial: dataInicialUTC,
+                intervalo: parseInt(intervalo),
+                dataFinal: dataFinalUTC,
                 userId: userId
             })
             
             if(resposta.status === 200) {
-                navigation.navigate("MeusRemedios")
+                navigation.navigate("MeusRemedios", {screen: "MeusRemedios"})
             }
 
         } catch (error) {
@@ -74,11 +99,11 @@ function CadastrarRemedio({navigation}) {
             padding: "5%",
             textAlign: "center",
             fontSize: 17,
-            fontWeight: 600,
+            fontWeight: 400,
             borderRadius: 10,
-            backgroundColor: "#0070FF",
+            backgroundColor: "#EDEDED",
             marginBottom: "10%",
-            color: "white"
+            color: "#6D6D6D"
         },
         selectImage: {
             width: "100%",
@@ -100,36 +125,41 @@ function CadastrarRemedio({navigation}) {
         <View style={{ flex: 1, justifyContent: "flex-start", alignItems: "center" }}>
             <View style={estilos.mainSection}>
                 <Text style={estilos.estiloText}>Cadastrar Remédio</Text>
-                <TextInput style={estilos.inputText} placeholder={isNomeFocus ? "" : "Nome do Remédio"} placeholderTextColor="white" 
+                <TextInput style={estilos.inputText} placeholder={isNomeFocus ? "" : "Nome do Remédio"} placeholderTextColor="#6D6D6D" 
                     onFocus={() => setNomeFocus(true)}
                     onBlur={() => setNomeFocus(false)}
                     value={nome}
                     onChangeText={(text) => setNome(text)}
                 />
-                <TextInput style={estilos.inputText} placeholder={isDosagemFocus ? "" : "Dosagem"} placeholderTextColor="white" 
+                <TextInput style={estilos.inputText} placeholder={isDosagemFocus ? "" : "Dosagem"} placeholderTextColor="#6D6D6D" 
                     onFocus={() => setDosagemFocus(true)}
                     onBlur={() => setDosagemFocus(false)} 
                     value={dosagem}
                     onChangeText={(text) => setDosagem(text)}
                 />
-                <TextInput style={estilos.inputText} placeholder={isDataInicialFocus ? "" : "Data Inicial"} placeholderTextColor="white" 
-                    onFocus={() => setDataInicialFocus(true)}
-                    onBlur={() => setDataInicialFocus(false)} 
-                    value={dataInicial}
-                    onChangeText={(text) => setDataInicial(text)}
-                />
-                <TextInput style={estilos.inputText} placeholder={isIntervaloFocus ? "" : "Intervalo"} placeholderTextColor="white" 
+                <View style={{width: "100%", flexDirection: "row", justifyContent: "center", marginBottom: "10%"}}>
+                    <DateTimePicker 
+                        mode="datetime" 
+                        display='clock' 
+                        value={dataInicialSelecionada} 
+                        placeholderText='Data'  
+                        onChange={handleInitialDateChange}
+                    />
+                </View>
+                <TextInput style={estilos.inputText} placeholder={isIntervaloFocus ? "" : "Intervalo"} placeholderTextColor="#6D6D6D" 
                     onFocus={() => setIntervaloFocus(true)}
                     onBlur={() => setIntervaloFocus(false)} 
                     value={intervalo}
                     onChangeText={(text) => setIntervalo(text)}
                 />
-                <TextInput style={estilos.inputText} placeholder={isDataFinalFocus ? "" : "Data Final"} placeholderTextColor="white" 
-                    onFocus={() => setDataFinalFocus(true)}
-                    onBlur={() => setDataFinalFocus(false)} 
-                    value={dataFinal}
-                    onChangeText={(text) => setDataFinal(text)}
-                />
+                <DateTimePicker
+                    mode="date"
+                    display='clock' 
+                    value={dataFinalSelecionada} 
+                    placeholderText='Final' 
+                    style={{marginBottom: "10%"}} 
+                    onChange={handleFinalDateChange}
+                    />
                 <TouchableOpacity style={estilos.selectImage} onPress={() => createRemedy()}>
                     <Text style={{color: "#B4B4B4", fontSize: 17, fontWeight: 600, textAlign: "center"}}>Pronto</Text>
                 </TouchableOpacity>

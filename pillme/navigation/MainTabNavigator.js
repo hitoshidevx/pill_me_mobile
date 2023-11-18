@@ -65,7 +65,7 @@ const CadastrarRemedioStack = () => {
 
 const MinhaContaStack = () => {
   return (
-    <Stack.Navigator>
+    <Stack.Navigator initialRouteName='CadastrarRemedio'>
       <Stack.Screen
         name="PillMe"
         component={MinhaConta}
