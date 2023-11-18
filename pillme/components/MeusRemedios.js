@@ -31,22 +31,11 @@ function MeusRemedios({ navigation }) {
     // Armazena o tempo restante ao fechar o modal
     const closeModal = () => {
         setModalVisible(false);
-        if (modalRemedio) {
-            const selectedRemedio = lista.find(remedio => remedio.id === modalRemedio.id);
-            if (selectedRemedio) {
-                setRemainingTime(selectedRemedio.diffHora * 60 * 60 + selectedRemedio.diffMinuto * 60 + selectedRemedio.diffSegundo);
-                // Salva o tempo restante em AsyncStorage
-                AsyncStorage.setItem('remainingTime', (selectedRemedio.diffHora * 60 * 60 + selectedRemedio.diffMinuto * 60 + selectedRemedio.diffSegundo).toString());
-            }
-        }
     };
 
     // Abre o modal e restaura o estado da contagem regressiva
     const openModal = (remedio) => {
         setModalRemedio(remedio);
-        if (remedio) {
-            setInitialRemainingTime(remedio.diffHora * 60 * 60 + remedio.diffMinuto * 60 + remedio.diffSegundo);
-        }
         setModalVisible(true);
     };
 
@@ -84,6 +73,8 @@ function MeusRemedios({ navigation }) {
                         const diffMinuto = minuto - minutoDataInicial
                         const diffSegundo = segundo - segundoDataInicial;
 
+                        const diffTotal = diffHora * 3600 + diffMinuto * 60 + diffSegundo; 
+
                         // Adiciona o novo objeto com a propriedade 'dataProximoAlarme' à nova lista
                         novaLista.push({
                             ...remedio,
@@ -96,12 +87,17 @@ function MeusRemedios({ navigation }) {
                             segundoDataInicial: segundoDataInicial,
                             diffHora: diffHora,
                             diffMinuto, diffMinuto,
-                            diffSegundo: diffSegundo // Convertendo para string no formato aceitável
+                            diffSegundo: diffSegundo,
+                            diffTotal: diffTotal
                         });
+                        
+                        setRemainingTime(diffTotal);
+                        setInitialRemainingTime(diffTotal);
                     }
                 }
 
                 setLista(novaLista);
+
             }
 
         } catch (error) {
@@ -110,58 +106,7 @@ function MeusRemedios({ navigation }) {
     };
 
     useEffect(() => {
-        const focusListener = navigation.addListener('focus', () => {
-            getRemedios();
-        });
-
-        return focusListener;
-    }, [navigation]);
-
-    useEffect(() => {
-        const interval = setInterval(() => {
-            const updatedList = lista.map(remedio => {
-                const diffTime = new Date(remedio.dataProximoAlarme) - new Date();
-
-                const diffHora = Math.floor((diffTime % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                const diffMinuto = Math.floor((diffTime % (1000 * 60 * 60)) / (1000 * 60));
-                const diffSegundo = Math.floor((diffTime % (1000 * 60)) / 1000);
-
-                return {
-                    ...remedio,
-                    diffHora,
-                    diffMinuto,
-                    diffSegundo
-                };
-            });
-
-            setLista(updatedList);
-
-            if (modalVisible && modalRemedio) {
-                const selectedRemedio = updatedList.find(remedio => remedio.id === modalRemedio.id);
-                if (selectedRemedio) {
-                    setRemainingTime(selectedRemedio.diffHora * 60 * 60 + selectedRemedio.diffMinuto * 60 + selectedRemedio.diffSegundo);
-                }
-            }
-        }, 1000);
-
-        return () => clearInterval(interval);
-
-    });
-
-    useEffect(() => {
-        // Ao iniciar, verifique se há um estado salvo em AsyncStorage
-        const restoreCountdownState = async () => {
-            try {
-                const savedRemainingTime = await AsyncStorage.getItem('remainingTime');
-                if (savedRemainingTime !== null) {
-                    setInitialRemainingTime(parseInt(savedRemainingTime));
-                }
-            } catch (error) {
-                console.log('Erro ao recuperar o estado da contagem regressiva:', error);
-            }
-        };
-
-        restoreCountdownState();
+        getRemedios();
     }, []);
 
     const estilos = StyleSheet.create({
@@ -215,16 +160,16 @@ function MeusRemedios({ navigation }) {
                             <TouchableOpacity style={estilos.pillSection} onPress={() => openModal(remedio)}>
                                     <View style={{ flexDirection: "column" }}>
                                         <Text style={{ color: "white", fontSize: 30, fontWeight: 600 }}>{remedio.nome}</Text>
-                                        <Text style={{ color: "#4F9CFF", fontSize: 18, fontWeight: 500, marginTop: "5%" }}>Alarme em: {remedio.diffHora}:{remedio.diffMinuto}:{remedio.diffSegundo}</Text>
+                                        <Text style={{ color: "#4F9CFF", fontSize: 18, fontWeight: 500, marginTop: "5%" }}>Alarme em: {remedio.diffHora > 1 ? (<Text>{remedio.diffHora} horas</Text>) : (<Text>{remedio.diffHora} hora</Text>)}</Text>
                                     </View>
                                     <View style={{ flexDirection: "column" }}>
                                         <CountdownCircleTimer
                                             isPlaying
-                                            duration={remainingTime}
-                                            initialRemainingTime={initialRemainingTime}
+                                            duration={remedio.diffTotal}
+                                            initialRemainingTime={remedio.diffTotal}
                                             size={50}
                                             strokeWidth={6}
-                                            colors={['0058C7', '#F7B801', '#A30000', '#A30000']} // Primeira cor alterada para azul
+                                            colors={['#0058C7', '#F7B801', '#A30000', '#A30000']} // Primeira cor alterada para azul
                                             colorsTime={[7, 5, 2, 0]}
                                         >
                                             
@@ -247,11 +192,11 @@ function MeusRemedios({ navigation }) {
 
                         {modalRemedio && ( // Verifica se modalRemedio não é null antes de acessar suas propriedades
                             <Text style={{ fontSize: 18, marginBottom: "5%" }}>
-                                {`Tempo restante: ${Math.floor(remainingTime / 3600)
+                                {`Tempo restante: ${Math.floor(modalRemedio.diffTotal / 3600)
                                     .toString()
-                                    .padStart(2, '0')}:${Math.floor((remainingTime % 3600) / 60)
+                                    .padStart(2, '0')}:${Math.floor((modalRemedio.diffTotal % 3600) / 60)
                                         .toString()
-                                        .padStart(2, '0')}:${(remainingTime % 60)
+                                        .padStart(2, '0')}:${(modalRemedio.diffTotal % 60)
                                             .toString()
                                             .padStart(2, '0')}`}
                             </Text>
