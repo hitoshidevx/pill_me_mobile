@@ -17,7 +17,7 @@ const apiKEY = axios.create({
     baseURL: "https://pill-time-3d9f9-default-rtdb.firebaseio.com"
 })
 
-function MeusRemedios( {navigation} ) {
+function MeusRemedios({ navigation }) {
 
     const [lista, setLista] = useState([]);
     const [countdown, setCountdown] = useState([]);
@@ -119,36 +119,36 @@ function MeusRemedios( {navigation} ) {
 
     useEffect(() => {
         const interval = setInterval(() => {
-          const updatedList = lista.map(remedio => {
-            const diffTime = new Date(remedio.dataProximoAlarme) - new Date();
-    
-            const diffHora = Math.floor((diffTime % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            const diffMinuto = Math.floor((diffTime % (1000 * 60 * 60)) / (1000 * 60));
-            const diffSegundo = Math.floor((diffTime % (1000 * 60)) / 1000);
-    
-            return {
-              ...remedio,
-              diffHora,
-              diffMinuto,
-              diffSegundo
-            };
-          });
-    
-          setLista(updatedList);
-    
-          if (modalVisible && modalRemedio) {
-            const selectedRemedio = updatedList.find(remedio => remedio.id === modalRemedio.id);
-            if (selectedRemedio) {
-              setRemainingTime(selectedRemedio.diffHora * 60 * 60 + selectedRemedio.diffMinuto * 60 + selectedRemedio.diffSegundo);
-            }
-          }
-        }, 1000);
-    
-        return () => clearInterval(interval);
-    
-      });
+            const updatedList = lista.map(remedio => {
+                const diffTime = new Date(remedio.dataProximoAlarme) - new Date();
 
-      useEffect(() => {
+                const diffHora = Math.floor((diffTime % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const diffMinuto = Math.floor((diffTime % (1000 * 60 * 60)) / (1000 * 60));
+                const diffSegundo = Math.floor((diffTime % (1000 * 60)) / 1000);
+
+                return {
+                    ...remedio,
+                    diffHora,
+                    diffMinuto,
+                    diffSegundo
+                };
+            });
+
+            setLista(updatedList);
+
+            if (modalVisible && modalRemedio) {
+                const selectedRemedio = updatedList.find(remedio => remedio.id === modalRemedio.id);
+                if (selectedRemedio) {
+                    setRemainingTime(selectedRemedio.diffHora * 60 * 60 + selectedRemedio.diffMinuto * 60 + selectedRemedio.diffSegundo);
+                }
+            }
+        }, 1000);
+
+        return () => clearInterval(interval);
+
+    });
+
+    useEffect(() => {
         // Ao iniciar, verifique se há um estado salvo em AsyncStorage
         const restoreCountdownState = async () => {
             try {
@@ -182,8 +182,10 @@ function MeusRemedios( {navigation} ) {
             backgroundColor: "#0171FF",
             borderRadius: 10,
             padding: "10%",
-            alignItems: "flex-start",
-            marginBottom: "20%"
+            marginBottom: "20%",
+            flexDirection: 'row', 
+            justifyContent: 'space-around', 
+            alignItems: 'center'
         },
         modalContainer: {
             flex: 1,
@@ -209,10 +211,25 @@ function MeusRemedios( {navigation} ) {
                     </Text>
                 ) : (
                     lista.map((remedio, index) => (
-                        <View key={index} style={{ width: "80%" }}>
+                        <View key={index} style={{ width: "80%", justifyContent: "space-between" }}>
                             <TouchableOpacity style={estilos.pillSection} onPress={() => openModal(remedio)}>
-                                <Text style={{ color: "white", fontSize: 30, fontWeight: 600 }}>{remedio.nome}</Text>
-                                <Text style={{ color: "#4F9CFF", fontSize: 20, fontWeight: 500 }}>Alarme em: {remedio.diffHora}:{remedio.diffMinuto}:{remedio.diffSegundo}</Text>
+                                    <View style={{ flexDirection: "column" }}>
+                                        <Text style={{ color: "white", fontSize: 30, fontWeight: 600 }}>{remedio.nome}</Text>
+                                        <Text style={{ color: "#4F9CFF", fontSize: 18, fontWeight: 500, marginTop: "5%" }}>Alarme em: {remedio.diffHora}:{remedio.diffMinuto}:{remedio.diffSegundo}</Text>
+                                    </View>
+                                    <View style={{ flexDirection: "column" }}>
+                                        <CountdownCircleTimer
+                                            isPlaying
+                                            duration={remainingTime}
+                                            initialRemainingTime={initialRemainingTime}
+                                            size={50}
+                                            strokeWidth={6}
+                                            colors={['0058C7', '#F7B801', '#A30000', '#A30000']} // Primeira cor alterada para azul
+                                            colorsTime={[7, 5, 2, 0]}
+                                        >
+                                            
+                                        </CountdownCircleTimer>
+                                    </View>
                             </TouchableOpacity>
                         </View>
                     ))
@@ -229,27 +246,15 @@ function MeusRemedios( {navigation} ) {
                     <View style={estilos.modalContent}>
 
                         {modalRemedio && ( // Verifica se modalRemedio não é null antes de acessar suas propriedades
-                            <CountdownCircleTimer
-                                isPlaying
-                                duration={remainingTime}
-                                initialRemainingTime={initialRemainingTime}
-                                size={200}
-                                colors={['#004777', '#F7B801', '#A30000', '#A30000']}
-                                colorsTime={[7, 5, 2, 0]}
-                                onComplete={closeModal}
-                            >
-                                {({ remainingTime }) => {
-                                    const hours = Math.floor(remainingTime / 3600);
-                                    const minutes = Math.floor((remainingTime % 3600) / 60);
-                                    const seconds = remainingTime % 60;
-
-                                    const formattedTime = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-
-                                    return (
-                                        <Text style={{ fontSize: 20 }}>{formattedTime}</Text>
-                                    );
-                                }}
-                            </CountdownCircleTimer>
+                            <Text style={{ fontSize: 18, marginBottom: "5%" }}>
+                                {`Tempo restante: ${Math.floor(remainingTime / 3600)
+                                    .toString()
+                                    .padStart(2, '0')}:${Math.floor((remainingTime % 3600) / 60)
+                                        .toString()
+                                        .padStart(2, '0')}:${(remainingTime % 60)
+                                            .toString()
+                                            .padStart(2, '0')}`}
+                            </Text>
                         )}
 
                         <TouchableOpacity
