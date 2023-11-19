@@ -232,6 +232,14 @@ function MeusRemedios({ navigation }) {
                             </Text>
                         )}
 
+                        <TouchableOpacity style={{ width: "100%", backgroundColor: "yellow", borderRadius: 10, marginTop: "15%",  padding: "3%" }}
+                            onPress={() => {
+                                navigation.navigate("EditarRemedio", { remedio: modalRemedio })
+                                closeModal()
+                            }}>
+                            <Text style={{ textAlign: "center", fontWeight: 600, fontSize: 20, color: "white" }}>Excluir Remédio</Text>
+                        </TouchableOpacity>
+
                         <TouchableOpacity style={{ width: "100%", backgroundColor: "#BF3434", borderRadius: 10, marginTop: "15%",  padding: "3%" }}
                             onPress={() => {
                                 excluirRemedio(modalRemedio)

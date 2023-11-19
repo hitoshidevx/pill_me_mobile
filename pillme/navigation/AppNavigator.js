@@ -4,6 +4,7 @@ import MainTabNavigator from './MainTabNavigator';
 import Home from '../components/Home';
 import Login from '../components/Login';
 import Cadastro from '../components/Cadastro';
+import EditarRemedio from '../components/EditarRemedio';
 
 const Stack = createStackNavigator();
 
@@ -16,7 +17,7 @@ function AppNavigator() {
                     title: 'PillTime',
                     headerStyle: {
                         backgroundColor: '#0171FF',
-                        height: 130,   
+                        height: 130,
                         borderBottomLeftRadius: 30,
                         borderBottomRightRadius: 30
                     },
@@ -32,7 +33,7 @@ function AppNavigator() {
                     title: 'PillTime',
                     headerStyle: {
                         backgroundColor: '#0171FF',
-                        height: 130,   
+                        height: 130,
                         borderBottomLeftRadius: 30,
                         borderBottomRightRadius: 30
                     },
@@ -48,7 +49,24 @@ function AppNavigator() {
                     title: 'PillTime',
                     headerStyle: {
                         backgroundColor: '#0171FF',
-                        height: 130,   
+                        height: 130,
+                        borderBottomLeftRadius: 30,
+                        borderBottomRightRadius: 30
+                    },
+                    headerTintColor: '#fff',
+                    headerTitleStyle: {
+                        fontSize: 40,
+                        fontWeight: 700
+                    },
+                    headerTitleAlign: 'center',
+                }} />
+
+            <Stack.Screen name="EditarRemedio" component={EditarRemedio}
+                options={{
+                    title: 'PillTime',
+                    headerStyle: {
+                        backgroundColor: '#0171FF',
+                        height: 130,
                         borderBottomLeftRadius: 30,
                         borderBottomRightRadius: 30
                     },
