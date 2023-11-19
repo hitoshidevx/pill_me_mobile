@@ -52,6 +52,7 @@ function MeusRemedios({ navigation }) {
                 for (const remedioKey in remedios) {
                     if (remedios[remedioKey].userId === userId) {
                         const remedio = remedios[remedioKey];
+                        const remedioId = remedioKey;
 
                         const dataInicial = new Date(remedio.dataInicial).getTime();
                         const dataInicialUTC = format(dataInicial, "yyyy-MM-dd'T'HH:mm:ss.SSSxxx");
@@ -78,6 +79,7 @@ function MeusRemedios({ navigation }) {
                         // Adiciona o novo objeto com a propriedade 'dataProximoAlarme' à nova lista
                         novaLista.push({
                             ...remedio,
+                            id: remedioId,
                             dataProximoAlarme: dataProximoAlarmeUTC,
                             hora: hora,
                             minuto: minuto,
@@ -107,7 +109,19 @@ function MeusRemedios({ navigation }) {
 
     useEffect(() => {
         getRemedios();
-    }, []);
+    })
+
+    useEffect(() => {
+        const focusListener = navigation.addListener('focus', () => {
+            getRemedios();
+        });
+
+        return focusListener;
+    }, [navigation]);
+
+    const excluirRemedio = (remedio) => {
+        return apiKEY.delete("/medicamentos/" + remedio.id + ".json")
+    }
 
     const estilos = StyleSheet.create({
         mainSection: {
@@ -158,16 +172,38 @@ function MeusRemedios({ navigation }) {
                     lista.map((remedio, index) => (
                         <View key={index} style={{ width: "80%", justifyContent: "space-between" }}>
                             <TouchableOpacity style={estilos.pillSection} onPress={() => openModal(remedio)}>
-                                    <View style={{ flexDirection: "column" }}>
+                                    <View style={{ flexDirection: "column", marginRight: "20%" }}>
                                         <Text style={{ color: "white", fontSize: 30, fontWeight: 600 }}>{remedio.nome}</Text>
-                                        <Text style={{ color: "#4F9CFF", fontSize: 18, fontWeight: 500, marginTop: "5%" }}>Alarme em: {remedio.diffHora > 1 ? (<Text>{remedio.diffHora} horas</Text>) : (<Text>{remedio.diffHora} hora</Text>)}</Text>
+                                        <CountdownCircleTimer
+                                            isPlaying
+                                            duration={remedio.diffTotal}
+                                            initialRemainingTime={remedio.diffTotal}
+                                            size={50}
+                                            strokeWidth={6}
+                                            trailColor='#0171FF'
+                                            colors={['#0171FF', '#0171FF', '#0171FF', '#0171FF']} // Primeira cor alterada para azul
+                                            colorsTime={[7, 5, 2, 0]}
+                                        >
+                                            {({ remainingTime }) => {
+                                                const hours = Math.floor(remainingTime / 3600);
+                                                const minutes = Math.floor((remainingTime % 3600) / 60);
+                                                const seconds = remainingTime % 60;
+
+                                                const formattedTime = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
+                                                return (
+                                                    <Text style={{ width: 100, fontSize: 20, color: "#4F9CFF", marginLeft: "100%" }}>Alarme em: {formattedTime}</Text>
+                                                );
+                                            }}
+        
+                                        </CountdownCircleTimer>
                                     </View>
                                     <View style={{ flexDirection: "column" }}>
                                         <CountdownCircleTimer
                                             isPlaying
                                             duration={remedio.diffTotal}
                                             initialRemainingTime={remedio.diffTotal}
-                                            size={50}
+                                            size={70}
                                             strokeWidth={6}
                                             colors={['#0058C7', '#F7B801', '#A30000', '#A30000']} // Primeira cor alterada para azul
                                             colorsTime={[7, 5, 2, 0]}
@@ -191,16 +227,18 @@ function MeusRemedios({ navigation }) {
                     <View style={estilos.modalContent}>
 
                         {modalRemedio && ( // Verifica se modalRemedio não é null antes de acessar suas propriedades
-                            <Text style={{ fontSize: 18, marginBottom: "5%" }}>
-                                {`Tempo restante: ${Math.floor(modalRemedio.diffTotal / 3600)
-                                    .toString()
-                                    .padStart(2, '0')}:${Math.floor((modalRemedio.diffTotal % 3600) / 60)
-                                        .toString()
-                                        .padStart(2, '0')}:${(modalRemedio.diffTotal % 60)
-                                            .toString()
-                                            .padStart(2, '0')}`}
+                            <Text style={{ fontSize: 25, fontWeight: 400 }}>
+                                {modalRemedio.nome}
                             </Text>
                         )}
+
+                        <TouchableOpacity style={{ width: "100%", backgroundColor: "#BF3434", borderRadius: 10, marginTop: "15%",  padding: "3%" }}
+                            onPress={() => {
+                                excluirRemedio(modalRemedio)
+                                closeModal()
+                            }}>
+                            <Text style={{ textAlign: "center", fontWeight: 600, fontSize: 20, color: "white" }}>Excluir Remédio</Text>
+                        </TouchableOpacity>
 
                         <TouchableOpacity
                             style={{ width: "100%", backgroundColor: "#0055C0", borderRadius: 10, marginTop: "15%", padding: "3%" }}
