@@ -45,13 +45,11 @@ function CadastrarRemedio({navigation}) {
 
     const handleInitialDateChange = () => {
         const currentDate = dataInicialSelecionada;
-        setShowDateTimePicker(Platform.OS === 'ios');
         setDataInicialSelecionada(currentDate);
     };
 
     const handleFinalDateChange = (event, selectedDate) => {
         const currentDate = selectedDate || dataFinalSelecionada;
-        setShowDateTimePicker(Platform.OS === 'ios');
         setDataFinalSelecionada(currentDate);
     };
 

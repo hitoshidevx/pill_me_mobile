@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState, useRef } from 'react';
 import {
     View,
     Text,
@@ -6,11 +6,12 @@ import {
     StyleSheet,
     Modal
 } from 'react-native';
-import { FlatList, TextInput } from 'react-native-gesture-handler';
+import { FlatList, TextInput, GestureHandlerRootView } from 'react-native-gesture-handler';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from "axios"
 import { CountdownCircleTimer } from 'react-native-countdown-circle-timer';
 import { format } from 'date-fns';
+import DraggableFlatList, { ScaleDecorator, ShadowDecorator, OpacityDecorator, useOnCellActiveAnimation } from 'react-native-draggable-flatlist';
 
 
 const apiKEY = axios.create({
@@ -18,6 +19,8 @@ const apiKEY = axios.create({
 })
 
 function MeusRemedios({ navigation }) {
+
+    const ref = useRef();
 
     const [lista, setLista] = useState([]);
     const [countdown, setCountdown] = useState([]);
@@ -74,7 +77,7 @@ function MeusRemedios({ navigation }) {
                         const diffMinuto = minuto - minutoDataInicial
                         const diffSegundo = segundo - segundoDataInicial;
 
-                        const diffTotal = diffHora * 3600 + diffMinuto * 60 + diffSegundo; 
+                        const diffTotal = diffHora * 3600 + diffMinuto * 60 + diffSegundo;
 
                         // Adiciona o novo objeto com a propriedade 'dataProximoAlarme' à nova lista
                         novaLista.push({
@@ -92,7 +95,7 @@ function MeusRemedios({ navigation }) {
                             diffSegundo: diffSegundo,
                             diffTotal: diffTotal
                         });
-                        
+
                         setRemainingTime(diffTotal);
                         setInitialRemainingTime(diffTotal);
                     }
@@ -109,7 +112,7 @@ function MeusRemedios({ navigation }) {
 
     useEffect(() => {
         getRemedios();
-    })
+    }, [])
 
     useEffect(() => {
         const focusListener = navigation.addListener('focus', () => {
@@ -121,6 +124,61 @@ function MeusRemedios({ navigation }) {
 
     const excluirRemedio = (remedio) => {
         return apiKEY.delete("/medicamentos/" + remedio.id + ".json")
+    }
+
+    const renderItem = ({ item, drag }) => {
+
+        const isActive = useOnCellActiveAnimation();
+
+        return(
+            <ScaleDecorator>
+                <OpacityDecorator activeOpacity={0.5}>
+                    <ShadowDecorator>
+                    <TouchableOpacity onLongPress={drag} style={[estilos.pillSection, {elevation: isActive ? 30 : 0}]} onPress={() => openModal(item)}>
+                                <View style={{ flexDirection: "column", marginRight: "20%" }}>
+                                    <Text style={{ color: "white", fontSize: 30, fontWeight: 600 }}>{item.nome}</Text>
+                                    <CountdownCircleTimer
+                                        isPlaying
+                                        duration={item.diffTotal}
+                                        initialRemainingTime={item.diffTotal}
+                                        size={50}
+                                        strokeWidth={6}
+                                        trailColor='#0171FF'
+                                        colors={['#0171FF', '#0171FF', '#0171FF', '#0171FF']} // Primeira cor alterada para azul
+                                        colorsTime={[7, 5, 2, 0]}
+                                    >
+                                        {({ remainingTime }) => {
+                                            const hours = Math.floor(remainingTime / 3600);
+                                            const minutes = Math.floor((remainingTime % 3600) / 60);
+                                            const seconds = remainingTime % 60;
+
+                                            const formattedTime = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
+                                            return (
+                                                <Text style={{ width: 100, fontSize: 20, color: "#4F9CFF", marginLeft: "100%" }}>Alarme em: {formattedTime}</Text>
+                                            );
+                                        }}
+
+                                    </CountdownCircleTimer>
+                                </View>
+                                <View style={{ flexDirection: "column" }}>
+                                    <CountdownCircleTimer
+                                        isPlaying
+                                        duration={item.diffTotal}
+                                        initialRemainingTime={item.diffTotal}
+                                        size={70}
+                                        strokeWidth={6}
+                                        colors={['#0058C7', '#F7B801', '#A30000', '#A30000']} // Primeira cor alterada para azul
+                                        colorsTime={[7, 5, 2, 0]}
+                                    >
+
+                                    </CountdownCircleTimer>
+                                </View>
+                            </TouchableOpacity>
+                    </ShadowDecorator>
+                </OpacityDecorator>
+            </ScaleDecorator>
+        )
     }
 
     const estilos = StyleSheet.create({
@@ -137,13 +195,14 @@ function MeusRemedios({ navigation }) {
             marginBottom: "15%"
         },
         pillSection: {
-            width: "100%",
+            width: "90%",
             backgroundColor: "#0171FF",
             borderRadius: 10,
             padding: "10%",
             marginBottom: "20%",
-            flexDirection: 'row', 
-            justifyContent: 'space-around', 
+            marginLeft: "5%",
+            flexDirection: 'row',
+            justifyContent: 'space-around',
             alignItems: 'center'
         },
         modalContainer: {
@@ -164,57 +223,18 @@ function MeusRemedios({ navigation }) {
         <View style={{ flex: 1, justifyContent: "flex-start", alignItems: "center" }}>
             <View style={estilos.mainSection}>
                 <Text style={estilos.estiloText}>Meus Remédios</Text>
-                {lista.length === 0 ? (
-                    <Text style={{ textAlign: 'center', fontSize: 30, color: '#6D6D6D', marginTop: "30%", fontWeight: 700 }}>
-                        Não há produtos cadastrados :(
-                    </Text>
-                ) : (
-                    lista.map((remedio, index) => (
-                        <View key={index} style={{ width: "80%", justifyContent: "space-between" }}>
-                            <TouchableOpacity style={estilos.pillSection} onPress={() => openModal(remedio)}>
-                                    <View style={{ flexDirection: "column", marginRight: "20%" }}>
-                                        <Text style={{ color: "white", fontSize: 30, fontWeight: 600 }}>{remedio.nome}</Text>
-                                        <CountdownCircleTimer
-                                            isPlaying
-                                            duration={remedio.diffTotal}
-                                            initialRemainingTime={remedio.diffTotal}
-                                            size={50}
-                                            strokeWidth={6}
-                                            trailColor='#0171FF'
-                                            colors={['#0171FF', '#0171FF', '#0171FF', '#0171FF']} // Primeira cor alterada para azul
-                                            colorsTime={[7, 5, 2, 0]}
-                                        >
-                                            {({ remainingTime }) => {
-                                                const hours = Math.floor(remainingTime / 3600);
-                                                const minutes = Math.floor((remainingTime % 3600) / 60);
-                                                const seconds = remainingTime % 60;
-
-                                                const formattedTime = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-
-                                                return (
-                                                    <Text style={{ width: 100, fontSize: 20, color: "#4F9CFF", marginLeft: "100%" }}>Alarme em: {formattedTime}</Text>
-                                                );
-                                            }}
-        
-                                        </CountdownCircleTimer>
-                                    </View>
-                                    <View style={{ flexDirection: "column" }}>
-                                        <CountdownCircleTimer
-                                            isPlaying
-                                            duration={remedio.diffTotal}
-                                            initialRemainingTime={remedio.diffTotal}
-                                            size={70}
-                                            strokeWidth={6}
-                                            colors={['#0058C7', '#F7B801', '#A30000', '#A30000']} // Primeira cor alterada para azul
-                                            colorsTime={[7, 5, 2, 0]}
-                                        >
-                                            
-                                        </CountdownCircleTimer>
-                                    </View>
-                            </TouchableOpacity>
-                        </View>
-                    ))
-                )}
+                <GestureHandlerRootView>
+                    <DraggableFlatList
+                        ref={ref}
+                        data={lista}
+                        renderItem={renderItem}
+                        keyExtractor={(item, index) => `draggable-item-${item.id}`}
+                        onDragEnd={({ data }) => {
+                            // Atualiza a ordem da lista após o arrasto
+                            setLista(data);
+                        }}
+                    />
+                </GestureHandlerRootView>
             </View>
 
             <Modal
@@ -232,7 +252,7 @@ function MeusRemedios({ navigation }) {
                             </Text>
                         )}
 
-                        <TouchableOpacity style={{ width: "100%", backgroundColor: "yellow", borderRadius: 10, marginTop: "15%",  padding: "3%" }}
+                        <TouchableOpacity style={{ width: "100%", backgroundColor: "yellow", borderRadius: 10, marginTop: "15%", padding: "3%" }}
                             onPress={() => {
                                 navigation.navigate("EditarRemedio", { remedio: modalRemedio })
                                 closeModal()
@@ -240,10 +260,11 @@ function MeusRemedios({ navigation }) {
                             <Text style={{ textAlign: "center", fontWeight: 600, fontSize: 20, color: "white" }}>Excluir Remédio</Text>
                         </TouchableOpacity>
 
-                        <TouchableOpacity style={{ width: "100%", backgroundColor: "#BF3434", borderRadius: 10, marginTop: "15%",  padding: "3%" }}
+                        <TouchableOpacity style={{ width: "100%", backgroundColor: "#BF3434", borderRadius: 10, marginTop: "15%", padding: "3%" }}
                             onPress={() => {
                                 excluirRemedio(modalRemedio)
                                 closeModal()
+                                getRemedios();
                             }}>
                             <Text style={{ textAlign: "center", fontWeight: 600, fontSize: 20, color: "white" }}>Excluir Remédio</Text>
                         </TouchableOpacity>

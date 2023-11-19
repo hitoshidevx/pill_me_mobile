@@ -110,10 +110,6 @@ const Cadastro = ({navigation}) => {
                             value={password}
                             onChangeText={(text) => setPassword(text)}
                         />
-                        <TextInput style={estilos.inputCadastro} placeholder="Digite Novamente..." secureTextEntry={true}
-                            value={confirmPassword}
-                            onChangeText={(text) => setConfirmPassword(text)}
-                        />  
                     </View>
                     <TouchableOpacity style={estilos.botaoCadastro} onPress={() => registerUser(email, password, name) }>
                         <Text style={estilos.textoBotaoCadastro}>Pronto</Text>

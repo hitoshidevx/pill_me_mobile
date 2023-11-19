@@ -18,6 +18,10 @@ const apiMinhaConta = axios.create({
     baseURL: "https://identitytoolkit.googleapis.com/v1"
 })
 
+const apiKeyRemedy = axios.create({
+    baseURL: "https://pill-time-3d9f9-default-rtdb.firebaseio.com"
+})
+
 const apiKEY = "AIzaSyCTfD20veiK1KRrq4wocpCWIa-8eFj09JE"
 
 function MinhaConta() {
@@ -47,8 +51,33 @@ function MinhaConta() {
         }
     }
 
+    const getRemedios = async () => {
+        try {
+            const userId = await AsyncStorage.getItem("userToken");
+            const resposta = await apiKeyRemedy.get(`/medicamentos.json?userId=${userId}`);
+
+            if (resposta.status === 200) {
+                const remedios = resposta.data;
+                let remediosNum = 0;
+
+                for (const remedioKey in remedios) {
+                    if (remedios[remedioKey].userId === userId) {
+                        remediosNum = remediosNum + 1
+                    }
+                }
+                
+                setRemedios(remediosNum)
+            }
+        } catch (error) {
+            console.log("Deu erro aqui: ", error)
+        }
+    };
+
+
+
     useEffect(() => {
         getUser();
+        getRemedios();
     }, [])
 
     const estilos = StyleSheet.create({
@@ -92,7 +121,7 @@ function MinhaConta() {
                         <Text style={estilos.textoCadastro}>Minha Conta</Text>
                         <Text style={estilos.inputCadastro} >Nome: {name}</Text>
                         <Text style={estilos.inputCadastro}>E-mail: {email}</Text>
-                        <Text style={estilos.inputCadastro}>Seus Remédios: 0</Text>
+                        <Text style={estilos.inputCadastro}>Seus Remédios: {remedios}</Text>
                     </View>
                 </View>
             </View>
