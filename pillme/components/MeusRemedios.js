@@ -1,22 +1,32 @@
-import React, { useContext, useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import {
     View,
     Text,
     TouchableOpacity,
     StyleSheet,
-    Modal
+    Modal,
+    Image
 } from 'react-native';
-import { FlatList, TextInput, GestureHandlerRootView } from 'react-native-gesture-handler';
+import { GestureHandlerRootView, PanGestureHandler, State } from 'react-native-gesture-handler';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from "axios"
 import { CountdownCircleTimer } from 'react-native-countdown-circle-timer';
 import { format } from 'date-fns';
 import DraggableFlatList, { ScaleDecorator, ShadowDecorator, OpacityDecorator, useOnCellActiveAnimation } from 'react-native-draggable-flatlist';
+import img from "../assets/adaptive-icon.png"
 
 
 const apiKEY = axios.create({
     baseURL: "https://pill-time-3d9f9-default-rtdb.firebaseio.com"
 })
+
+function ImageViewer({ placeholderImageSource, selectedImage }) {
+    const imageSource = selectedImage ? { uri: selectedImage } : placeholderImageSource;
+
+    return (<>
+        <Image source={imageSource} style={{ width: 90, height: 90, borderRadius: 50, marginLeft: "30%" }} />
+    </>)
+}
 
 function MeusRemedios({ navigation }) {
 
@@ -130,51 +140,51 @@ function MeusRemedios({ navigation }) {
 
         const isActive = useOnCellActiveAnimation();
 
-        return(
+        return (
             <ScaleDecorator>
                 <OpacityDecorator activeOpacity={0.5}>
                     <ShadowDecorator>
-                    <TouchableOpacity onLongPress={drag} style={[estilos.pillSection, {elevation: isActive ? 30 : 0}]} onPress={() => openModal(item)}>
-                                <View style={{ flexDirection: "column", marginRight: "20%" }}>
-                                    <Text style={{ color: "white", fontSize: 30, fontWeight: 600 }}>{item.nome}</Text>
-                                    <CountdownCircleTimer
-                                        isPlaying
-                                        duration={item.diffTotal}
-                                        initialRemainingTime={item.diffTotal}
-                                        size={50}
-                                        strokeWidth={6}
-                                        trailColor='#0171FF'
-                                        colors={['#0171FF', '#0171FF', '#0171FF', '#0171FF']} // Primeira cor alterada para azul
-                                        colorsTime={[7, 5, 2, 0]}
-                                    >
-                                        {({ remainingTime }) => {
-                                            const hours = Math.floor(remainingTime / 3600);
-                                            const minutes = Math.floor((remainingTime % 3600) / 60);
-                                            const seconds = remainingTime % 60;
+                        <TouchableOpacity onLongPress={drag} style={[estilos.pillSection, { elevation: isActive ? 30 : 0 }]} onPress={() => openModal(item)}>
+                            <View style={{ flexDirection: "column", marginRight: "20%" }}>
+                                <Text style={{ color: "white", fontSize: 30, fontWeight: 600 }}>{item.nome}</Text>
+                                <CountdownCircleTimer
+                                    isPlaying
+                                    duration={item.diffTotal}
+                                    initialRemainingTime={item.diffTotal}
+                                    size={50}
+                                    strokeWidth={6}
+                                    trailColor='#0171FF'
+                                    colors={['#0171FF', '#0171FF', '#0171FF', '#0171FF']} // Primeira cor alterada para azul
+                                    colorsTime={[7, 5, 2, 0]}
+                                >
+                                    {({ remainingTime }) => {
+                                        const hours = Math.floor(remainingTime / 3600);
+                                        const minutes = Math.floor((remainingTime % 3600) / 60);
+                                        const seconds = remainingTime % 60;
 
-                                            const formattedTime = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                                        const formattedTime = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 
-                                            return (
-                                                <Text style={{ width: 100, fontSize: 20, color: "#4F9CFF", marginLeft: "100%" }}>Alarme em: {formattedTime}</Text>
-                                            );
-                                        }}
+                                        return (
+                                            <Text style={{ width: 100, fontSize: 20, color: "#4F9CFF", marginLeft: "100%" }}>Alarme em: {formattedTime}</Text>
+                                        );
+                                    }}
 
-                                    </CountdownCircleTimer>
-                                </View>
-                                <View style={{ flexDirection: "column" }}>
-                                    <CountdownCircleTimer
-                                        isPlaying
-                                        duration={item.diffTotal}
-                                        initialRemainingTime={item.diffTotal}
-                                        size={70}
-                                        strokeWidth={6}
-                                        colors={['#0058C7', '#F7B801', '#A30000', '#A30000']} // Primeira cor alterada para azul
-                                        colorsTime={[7, 5, 2, 0]}
-                                    >
+                                </CountdownCircleTimer>
+                            </View>
+                            <View style={{ flexDirection: "column" }}>
+                                <CountdownCircleTimer
+                                    isPlaying
+                                    duration={item.diffTotal}
+                                    initialRemainingTime={item.diffTotal}
+                                    size={70}
+                                    strokeWidth={6}
+                                    colors={['#0058C7', '#F7B801', '#A30000', '#A30000']} // Primeira cor alterada para azul
+                                    colorsTime={[7, 5, 2, 0]}
+                                >
 
-                                    </CountdownCircleTimer>
-                                </View>
-                            </TouchableOpacity>
+                                </CountdownCircleTimer>
+                            </View>
+                        </TouchableOpacity>
                     </ShadowDecorator>
                 </OpacityDecorator>
             </ScaleDecorator>
@@ -212,11 +222,23 @@ function MeusRemedios({ navigation }) {
             backgroundColor: 'rgba(0, 0, 0, 0.5)', // Fundo semi-transparente para destacar o modal
         },
         modalContent: {
+            width: "80%",
             backgroundColor: 'white',
-            padding: "15%",
-            alignItems: 'center',
+            padding: "10%",
             borderRadius: 10
         },
+        infoModal: {
+            width: "100%",
+            borderColor: "#0055C0",
+            borderWidth: 2,
+            marginTop: "10%",
+            padding: "5%",
+            color: "#111111",
+            fontWeight: 600,
+            fontSize: 20,
+            textAlign: "center",
+            borderRadius: 10
+        }
     })
 
     return (
@@ -247,34 +269,39 @@ function MeusRemedios({ navigation }) {
                     <View style={estilos.modalContent}>
 
                         {modalRemedio && ( // Verifica se modalRemedio não é null antes de acessar suas propriedades
-                            <Text style={{ fontSize: 25, fontWeight: 400 }}>
-                                {modalRemedio.nome}
-                            </Text>
+                            <View>
+                                <View style={{ flexDirection: "row", justifyContent: "space-evenly", marginBottom: "10%"  }}>
+                                    <TouchableOpacity style={{ width: "100%", borderRadius: 10, padding: "3%" }}
+                                        onPress={closeModal}>
+                                        <Text style={{ textAlign: "center", fontWeight: 700, fontSize: 15, color: "#0055C0" }}>Cancelar</Text>
+                                    </TouchableOpacity>
+
+                                    <TouchableOpacity style={{ width: "100%", borderRadius: 10, padding: "3%" }}
+                                        onPress={() => {
+                                            navigation.navigate("EditarRemedio", { remedio: modalRemedio })
+                                            closeModal()
+                                        }}>
+                                        <Text style={{ textAlign: "center", fontWeight: 700, fontSize: 15, color: "#0055C0" }}>Editar</Text>
+                                    </TouchableOpacity>
+
+                                </View>
+                                <View style={{ alignContent: "center" }}>
+                                    <ImageViewer placeholderImageSource={img} selectedImage={"data:image/png;base64," + modalRemedio.image} />
+                                </View>
+                                <Text style={estilos.infoModal}>{modalRemedio.nome}</Text>
+                                <Text style={estilos.infoModal}>{modalRemedio.dosagem}</Text>
+                                <TouchableOpacity
+                                    style={{ width: "100%", backgroundColor: "#E32F50", borderRadius: 10, marginTop: "10%", padding: "3%" }}
+                                    onPress={() => {
+                                        excluirRemedio(modalRemedio)
+                                        closeModal()
+                                        getRemedios();
+                                    }}
+                                >
+                                    <Text style={{ textAlign: "center", fontWeight: 600, fontSize: 20, color: "white" }}>Excluir</Text>
+                                </TouchableOpacity>
+                            </View>
                         )}
-
-                        <TouchableOpacity style={{ width: "100%", backgroundColor: "yellow", borderRadius: 10, marginTop: "15%", padding: "3%" }}
-                            onPress={() => {
-                                navigation.navigate("EditarRemedio", { remedio: modalRemedio })
-                                closeModal()
-                            }}>
-                            <Text style={{ textAlign: "center", fontWeight: 600, fontSize: 20, color: "white" }}>Excluir Remédio</Text>
-                        </TouchableOpacity>
-
-                        <TouchableOpacity style={{ width: "100%", backgroundColor: "#BF3434", borderRadius: 10, marginTop: "15%", padding: "3%" }}
-                            onPress={() => {
-                                excluirRemedio(modalRemedio)
-                                closeModal()
-                                getRemedios();
-                            }}>
-                            <Text style={{ textAlign: "center", fontWeight: 600, fontSize: 20, color: "white" }}>Excluir Remédio</Text>
-                        </TouchableOpacity>
-
-                        <TouchableOpacity
-                            style={{ width: "100%", backgroundColor: "#0055C0", borderRadius: 10, marginTop: "15%", padding: "3%" }}
-                            onPress={closeModal}
-                        >
-                            <Text style={{ textAlign: "center", fontWeight: 600, fontSize: 20, color: "white" }}>Ok</Text>
-                        </TouchableOpacity>
                     </View>
                 </View>
             </Modal>

@@ -14,6 +14,7 @@ import { TextInput } from 'react-native-gesture-handler';
 import axios from "axios"
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import * as ImagePicker from 'expo-image-picker';
 import {  format  } from 'date-fns';
 
 const apiKEY = axios.create({
@@ -40,6 +41,8 @@ function CadastrarRemedio({navigation}) {
     const [horaInicio, setHoraInicio] = useState(new Date());
     const [dataNotificacao, setDataNotificacao] = useState(new Date());
 
+    // Imagem
+    const [base, setBase] = useState(null)
 
     const [showDateTimePicker, setShowDateTimePicker] = useState(false);
 
@@ -52,6 +55,21 @@ function CadastrarRemedio({navigation}) {
         const currentDate = selectedDate || dataFinalSelecionada;
         setDataFinalSelecionada(currentDate);
     };
+
+    const picker = async ( ) => { 
+        let result = await ImagePicker.launchImageLibraryAsync({
+          allowsEditing: false,
+          base64: true,
+          quality: 1,
+        });
+    
+        if (!result.canceled) {
+          console.log(result);
+          setBase(result.assets[0].base64);
+        } else {
+          alert('You did not select any image.');
+        }
+      }
 
     // Função para criar o remédio
     const createRemedy = async () => {
@@ -67,6 +85,7 @@ function CadastrarRemedio({navigation}) {
                 dataInicial: dataInicialUTC,
                 intervalo: parseInt(intervalo),
                 dataFinal: dataFinalUTC,
+                image: base,
                 userId: userId
             })
             
@@ -158,6 +177,11 @@ function CadastrarRemedio({navigation}) {
                     style={{marginBottom: "10%"}} 
                     onChange={handleFinalDateChange}
                     />
+                    
+                <TouchableOpacity style={estilos.selectImage} onPress={() => picker()}>
+                    <Text style={{color: "#B4B4B4", fontSize: 17, fontWeight: 600, textAlign: "center"}}>Escolher Foto</Text>
+                </TouchableOpacity>
+
                 <TouchableOpacity style={estilos.selectImage} onPress={() => createRemedy()}>
                     <Text style={{color: "#B4B4B4", fontSize: 17, fontWeight: 600, textAlign: "center"}}>Pronto</Text>
                 </TouchableOpacity>
