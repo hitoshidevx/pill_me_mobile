@@ -113,7 +113,7 @@ function CadastrarRemedio({navigation}) {
         },
         inputText: {
             width: "100%",
-            padding: "5%",
+            padding: "3%",
             textAlign: "center",
             fontSize: 17,
             fontWeight: 400,
@@ -125,7 +125,7 @@ function CadastrarRemedio({navigation}) {
         selectImage: {
             width: "100%",
             backgroundColor: "white",
-            padding: "5%",
+            padding: "3%",
             borderRadius: 10,
             shadowColor: '#000', // Cor da sombra
             shadowOffset: {
@@ -134,7 +134,22 @@ function CadastrarRemedio({navigation}) {
             },
             shadowOpacity: 0.4, // Opacidade da sombra
             shadowRadius: 2, // Raio da sombra
-            elevation: 3, // Efeito de elevação para dispositivos Android
+            elevation: 3, // Efeito de elevação para dispositivos Android,
+            marginBottom: "10%"
+        },
+        confirmButton: {
+            width: "100%",
+            backgroundColor: "#0171FF",
+            padding: "3%",
+            borderRadius: 10,
+            shadowColor: '#000', // Cor da sombra
+            shadowOffset: {
+            width: 0,
+            height: 4,
+            },
+            shadowOpacity: 0.4, // Opacidade da sombra
+            shadowRadius: 2, // Raio da sombra
+            elevation: 3, // Efeito de elevação para dispositivos Android,
         }
     })
 
@@ -182,8 +197,8 @@ function CadastrarRemedio({navigation}) {
                     <Text style={{color: "#B4B4B4", fontSize: 17, fontWeight: 600, textAlign: "center"}}>Escolher Foto</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity style={estilos.selectImage} onPress={() => createRemedy()}>
-                    <Text style={{color: "#B4B4B4", fontSize: 17, fontWeight: 600, textAlign: "center"}}>Pronto</Text>
+                <TouchableOpacity style={estilos.confirmButton} onPress={() => createRemedy()}>
+                    <Text style={{color: "white", fontSize: 17, fontWeight: 600, textAlign: "center"}}>Pronto</Text>
                 </TouchableOpacity>
             </View>
         </View>

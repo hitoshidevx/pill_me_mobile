@@ -13,16 +13,17 @@ import {
 import { TextInput } from 'react-native-gesture-handler';
 import axios from "axios"
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as ImagePicker from 'expo-image-picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import {  format  } from 'date-fns';
+import { format } from 'date-fns';
 
 const apiKEY = axios.create({
     baseURL: "https://pill-time-3d9f9-default-rtdb.firebaseio.com"
 })
 
-function EditarRemedio( { route, navigation } ) {
+function EditarRemedio({ route, navigation }) {
 
-    
+
     const { remedio } = route.params;
 
     // Lógica dos Placeholders
@@ -38,6 +39,9 @@ function EditarRemedio( { route, navigation } ) {
     const [dataInicialSelecionada, setDataInicialSelecionada] = useState(new Date())
     const [intervalo, setIntervalo] = useState(0)
     const [dataFinalSelecionada, setDataFinalSelecionada] = useState(new Date())
+
+    // Imagem
+    const [base, setBase] = useState(null)
 
     // Testando logica
     const [horaInicio, setHoraInicio] = useState(new Date());
@@ -58,6 +62,21 @@ function EditarRemedio( { route, navigation } ) {
         setDataFinalSelecionada(currentDate);
     };
 
+    const picker = async () => {
+        let result = await ImagePicker.launchImageLibraryAsync({
+            allowsEditing: false,
+            base64: true,
+            quality: 1,
+        });
+
+        if (!result.canceled) {
+            console.log(result);
+            setBase(result.assets[0].base64);
+        } else {
+            alert('You did not select any image.');
+        }
+    }
+
     // Função para criar o remédio
     const alterRemedy = async () => {
         try {
@@ -72,11 +91,12 @@ function EditarRemedio( { route, navigation } ) {
                 dataInicial: dataInicialUTC,
                 intervalo: parseInt(intervalo),
                 dataFinal: dataFinalUTC,
+                image: base,
                 userId: userId
             })
-            
-            if(resposta.status === 200) {
-                navigation.navigate("MeusRemedios", {screen: "MeusRemedios"})
+
+            if (resposta.status === 200) {
+                navigation.navigate("MeusRemedios", { screen: "MeusRemedios" })
             }
 
         } catch (error) {
@@ -116,16 +136,31 @@ function EditarRemedio( { route, navigation } ) {
         selectImage: {
             width: "100%",
             backgroundColor: "white",
-            padding: "5%",
+            padding: "3%",
             borderRadius: 10,
             shadowColor: '#000', // Cor da sombra
             shadowOffset: {
-            width: 0,
-            height: 4,
+                width: 0,
+                height: 4,
             },
             shadowOpacity: 0.4, // Opacidade da sombra
             shadowRadius: 2, // Raio da sombra
-            elevation: 3, // Efeito de elevação para dispositivos Android
+            elevation: 3, // Efeito de elevação para dispositivos Android,
+            marginBottom: "10%"
+        },
+        confirmButton: {
+            width: "100%",
+            backgroundColor: "#0171FF",
+            padding: "3%",
+            borderRadius: 10,
+            shadowColor: '#000', // Cor da sombra
+            shadowOffset: {
+                width: 0,
+                height: 4,
+            },
+            shadowOpacity: 0.4, // Opacidade da sombra
+            shadowRadius: 2, // Raio da sombra
+            elevation: 3, // Efeito de elevação para dispositivos Android,
         }
     })
 
@@ -133,43 +168,48 @@ function EditarRemedio( { route, navigation } ) {
         <View style={{ flex: 1, justifyContent: "flex-start", alignItems: "center" }}>
             <View style={estilos.mainSection}>
                 <Text style={estilos.estiloText}>Editar Remédio</Text>
-                <TextInput style={estilos.inputText} placeholder={isNomeFocus ? "" : "Nome do Remédio"} placeholderTextColor="#6D6D6D" 
+                <TextInput style={estilos.inputText} placeholder={isNomeFocus ? "" : "Nome do Remédio"} placeholderTextColor="#6D6D6D"
                     onFocus={() => setNomeFocus(true)}
                     onBlur={() => setNomeFocus(false)}
                     value={nome}
                     onChangeText={(text) => setNome(text)}
                 />
-                <TextInput style={estilos.inputText} placeholder={isDosagemFocus ? "" : "Dosagem"} placeholderTextColor="#6D6D6D" 
+                <TextInput style={estilos.inputText} placeholder={isDosagemFocus ? "" : "Dosagem"} placeholderTextColor="#6D6D6D"
                     onFocus={() => setDosagemFocus(true)}
-                    onBlur={() => setDosagemFocus(false)} 
+                    onBlur={() => setDosagemFocus(false)}
                     value={dosagem}
                     onChangeText={(text) => setDosagem(text)}
                 />
-                <View style={{width: "100%", flexDirection: "row", justifyContent: "center", marginBottom: "10%"}}>
-                    <DateTimePicker 
-                        mode="datetime" 
-                        display='clock' 
-                        value={dataInicialSelecionada} 
-                        placeholderText='Data'  
+                <View style={{ width: "100%", flexDirection: "row", justifyContent: "center", marginBottom: "10%" }}>
+                    <DateTimePicker
+                        mode="datetime"
+                        display='clock'
+                        value={dataInicialSelecionada}
+                        placeholderText='Data'
                         onChange={handleInitialDateChange}
                     />
                 </View>
-                <TextInput style={estilos.inputText} placeholder={isIntervaloFocus ? "" : "Intervalo"} placeholderTextColor="#6D6D6D" 
+                <TextInput style={estilos.inputText} placeholder={isIntervaloFocus ? "" : "Intervalo"} placeholderTextColor="#6D6D6D"
                     onFocus={() => setIntervaloFocus(true)}
-                    onBlur={() => setIntervaloFocus(false)} 
+                    onBlur={() => setIntervaloFocus(false)}
                     value={intervalo}
                     onChangeText={(text) => setIntervalo(text)}
                 />
                 <DateTimePicker
                     mode="date"
-                    display='clock' 
-                    value={dataFinalSelecionada} 
-                    placeholderText='Final' 
-                    style={{marginBottom: "10%"}} 
+                    display='clock'
+                    value={dataFinalSelecionada}
+                    placeholderText='Final'
+                    style={{ marginBottom: "10%" }}
                     onChange={handleFinalDateChange}
-                    />
-                <TouchableOpacity style={estilos.selectImage} onPress={() => alterRemedy()}>
-                    <Text style={{color: "#B4B4B4", fontSize: 17, fontWeight: 600, textAlign: "center"}}>Pronto</Text>
+                />
+
+                <TouchableOpacity style={estilos.selectImage} onPress={() => picker()}>
+                    <Text style={{ color: "#B4B4B4", fontSize: 17, fontWeight: 600, textAlign: "center" }}>Escolher Foto</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity style={estilos.confirmButton} onPress={() => alterRemedy()}>
+                    <Text style={{ color: "#B4B4B4", fontSize: 17, fontWeight: 600, textAlign: "center" }}>Pronto</Text>
                 </TouchableOpacity>
             </View>
         </View>

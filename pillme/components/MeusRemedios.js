@@ -246,16 +246,18 @@ function MeusRemedios({ navigation }) {
             <View style={estilos.mainSection}>
                 <Text style={estilos.estiloText}>Meus Remédios</Text>
                 <GestureHandlerRootView>
-                    <DraggableFlatList
-                        ref={ref}
-                        data={lista}
-                        renderItem={renderItem}
-                        keyExtractor={(item, index) => `draggable-item-${item.id}`}
-                        onDragEnd={({ data }) => {
-                            // Atualiza a ordem da lista após o arrasto
-                            setLista(data);
-                        }}
-                    />
+                    {lista.length > 0 ? // Sim, tem remédio pra exibir
+                        <DraggableFlatList
+                            ref={ref}
+                            data={lista}
+                            renderItem={renderItem}
+                            keyExtractor={(item, index) => `draggable-item-${item.id}`}
+                            onDragEnd={({ data }) => {
+                                // Atualiza a ordem da lista após o arrasto
+                                setLista(data);
+                            }}
+                        /> : // Não, não tem remédio para exibir
+                        <Text style={{fontSize: 20, fontWeight: 600, color: "#6D6D6D", marginTop: "30%"}}>Não há remedios Cadastrados</Text>}
                 </GestureHandlerRootView>
             </View>
 
@@ -270,7 +272,7 @@ function MeusRemedios({ navigation }) {
 
                         {modalRemedio && ( // Verifica se modalRemedio não é null antes de acessar suas propriedades
                             <View>
-                                <View style={{ flexDirection: "row", justifyContent: "space-evenly", marginBottom: "10%"  }}>
+                                <View style={{ flexDirection: "row", justifyContent: "space-evenly", marginBottom: "10%" }}>
                                     <TouchableOpacity style={{ width: "100%", borderRadius: 10, padding: "3%" }}
                                         onPress={closeModal}>
                                         <Text style={{ textAlign: "center", fontWeight: 700, fontSize: 15, color: "#0055C0" }}>Cancelar</Text>
